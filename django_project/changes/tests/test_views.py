@@ -4,7 +4,9 @@
 import datetime
 import json
 from datetime import timedelta
+from io import BytesIO
 from mock import mock
+from zipfile import ZipFile
 from django.urls import reverse
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
@@ -771,6 +773,13 @@ class TestVersionViews(TestCase):
             response.context.get('version'),
             version_same_name_from_other_project)
         self.assertEqual(response.status_code, 200)
+        with BytesIO(response.content) as file:
+            with ZipFile(file, 'r') as zip_file:
+                name_list = zip_file.namelist()
+                self.assertIsNone(zip_file.testzip())
+                self.assertIn('index.rst', name_list)
+                self.assertIn('image', name_list)
+                self.assertNotIn('images/', name_list)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     @mock.patch('pypandoc.convert', side_effect=mocked_convert)
