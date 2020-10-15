@@ -315,12 +315,13 @@ devweb-runserver: devweb
 	@echo "------------------------------------------------------------------"
 	@docker exec $(PROJECT_ID)-dev-web python manage.py runserver 0.0.0.0:8080
 
-devweb-test: devweb
+test: devweb flake8
 	@echo
 	@echo "------------------------------------------------------------------"
 	@echo "Testing in DEVELOPMENT mode"
 	@echo "------------------------------------------------------------------"
 	@docker exec $(PROJECT_ID)-dev-web coverage run manage.py test
+	@docker exec $(PROJECT_ID)-dev-web coverage report
 
 build-devweb: db
 	@echo
@@ -394,7 +395,7 @@ help:
 	@echo "* **deploy** ."
 	@echo "* **devweb** - create an ssh container derived from uwsgi that can be used as a remote interpreter for PyCharm. See [development notes](README-dev.md)."
 	@echo "* **devweb-runserver** - force run ssh container, only if not use a remote interpreter."
-	@echo "* **devweb-test** - run test in development environment."
+	@echo "* **test** - run coverage test in development environment."
 	@echo "* **enable-machine** - "
 	@echo "* **kill** - kills all running containers. Does not remove them."
 	@echo "* **logs** - view the logs of all running containers. Note that you can also view individual logs in the deployment/logs directory."
