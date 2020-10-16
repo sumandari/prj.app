@@ -606,10 +606,11 @@ class VersionDownload(CustomStaffuserRequiredMixin, VersionMixin, DetailView):
             for image in images:
                 try:
                     image_url = '{}/{}'.format(settings.MEDIA_ROOT, image)
-                    zip_file.write(
-                        image_url,
-                        '{0}'.format(image)
-                    )
+                    if not image == 'index.rst':
+                        zip_file.write(
+                            image_url,
+                            '{0}'.format(image)
+                        )
                 except FileNotFoundError:
                     pass
             # write the actual RST document

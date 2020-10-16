@@ -778,8 +778,7 @@ class TestVersionViews(TestCase):
                 name_list = zip_file.namelist()
                 self.assertIsNone(zip_file.testzip())
                 self.assertIn('index.rst', name_list)
-                self.assertIn('images/', name_list)
-                self.assertNotIn('images/', name_list)
+                self.assertNotIn('images/index.rst', name_list)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
     @mock.patch('pypandoc.convert', side_effect=mocked_convert)
