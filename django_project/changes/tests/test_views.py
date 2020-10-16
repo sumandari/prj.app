@@ -6,8 +6,10 @@ import json
 from datetime import timedelta
 from io import BytesIO
 from mock import mock
+from PIL import Image
 from zipfile import ZipFile
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.test.client import Client
@@ -761,9 +763,18 @@ class TestVersionViews(TestCase):
     def test_VersionDownload_login(self, mocked_convert):
         self.client.login(username='timlinux', password='password')
         other_project = ProjectF.create(name='testproject2')
+        # create image for testing
+        temp_file = BytesIO()
+        image = Image.new('RGBA', size=(15, 15), color=(100,0,0))
+        image.save(temp_file, 'png')
+        temp_file.name = 'test_image.png'
+        temp_file.seek(0)
         version_same_name_from_other_project = VersionF.create(
             project=other_project,
-            name='1.0.1'
+            name='1.0.1',
+            image_file=SimpleUploadedFile(name='test_image.png',
+                                    content=temp_file.read(),
+                                     content_type='image/jpeg')
         )
         response = self.client.get(reverse('version-download', kwargs={
             'slug': version_same_name_from_other_project.slug,
@@ -778,6 +789,7 @@ class TestVersionViews(TestCase):
                 name_list = zip_file.namelist()
                 self.assertIsNone(zip_file.testzip())
                 self.assertIn('index.rst', name_list)
+                self.assertIn('images/test_image.png', name_list)
                 self.assertNotIn('images/index.rst', name_list)
 
     @override_settings(VALID_DOMAIN=['testserver', ])
