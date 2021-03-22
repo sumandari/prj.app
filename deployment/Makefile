@@ -258,10 +258,10 @@ mediasync:
 	@echo "------------------------------------------------------------------"
 	@echo "Syncing media files and secret.py from live server"
 	@echo "------------------------------------------------------------------"
-	@rsync -av --progress changelog.kartoza.com:/home/projecta/deployment/media/ media
-	@rsync -av --progress changelog.kartoza.com:/home/projecta/django_project/core/settings/secret.py ../django_project/core/settings/
-	@rsync -av --progress changelog.kartoza.com:/home/projecta/deployment/btsync-db.env btsync-db.env.PRODUCTION
-	@rsync -av --progress changelog.kartoza.com:/home/projecta/deployment/btsync-media.env btsync-media.env.PRODUCTION
+	@rsync -av --progress changelog.qgis.org:/home/projecta/deployment/media/ /home/suman/kartoza/backup_projects/changelog.qgis/media
+	@rsync -av --progress changelog.qgis.org:/home/projecta/django_project/core/settings/secret.py ../django_project/core/settings/
+	@rsync -av --progress changelog.qgis.org:/home/projecta/deployment/btsync-db.env btsync-db.env.PRODUCTION
+	@rsync -av --progress changelog.qgis.org:/home/projecta/deployment/btsync-media.env btsync-media.env.PRODUCTION
 
 dbsync:
 	@echo
