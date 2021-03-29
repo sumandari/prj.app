@@ -8,6 +8,7 @@ import warnings
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.http import JsonResponse
 from braces.views import LoginRequiredMixin
 from rest_framework import serializers
@@ -251,6 +252,19 @@ def download_all_referenced_images(request, **kwargs):
                 if len(images) > 0:
                     for i, image in enumerate(images):
                         filename = image.rsplit('/', 1)[-1]
+
+                        # Take the first image set in the pull request
+                        # and set it as default for the entry and remove
+                        # it from the body
+                        if i == 0:
+                            response = requests.get(image)
+                            if response.status_code == 200:
+                                entry.image_file.save(
+                                    filename,
+                                    ContentFile(response.content), save=True)
+                                html = html.replace(image, '')
+                            continue
+
                         folder_path = os.path.join(
                             settings.MEDIA_ROOT,
                             'images/entries')
@@ -281,12 +295,6 @@ def download_all_referenced_images(request, **kwargs):
                             img_url = file_path.replace('/home/web', '')
                             html = html.replace(image, img_url)
                             html = re.sub(r"alt=\".*?\"", "", html)
-                        if i == 0:
-                            # Take the first image set in the pull request
-                            # and set it as default for the entry and remove
-                            # it from the body
-                            entry.image_file = img_url.replace('/media', '')
-                            html = html.replace(img_url, '')
 
                 entry.description = html
                 entry.save()
